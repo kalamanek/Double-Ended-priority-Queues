@@ -23,7 +23,7 @@ int main() {
  //   std::cout << a.getMin().key << '\n';
  //   a.removeMin();
  //   a.dumpKeys();
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 50; i++){
         std::cout << '\n' << a.getMax().key << '\n';
         a.removeMax();
         a.dumpKeys();
