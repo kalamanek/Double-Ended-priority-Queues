@@ -12,25 +12,25 @@ template<typename T>
 class SymmetricMinMaxHeap : public QueueBase<T> {
 	std::vector<Element<T>> v;
 
-	inline int PARENT(const int& i) {
+	inline size_t PARENT(const size_t& i) {
 		return 	((i - 1) / 2);
 	}
-	inline int LCHILD(const int& i) {
+	inline size_t LCHILD(const size_t& i) {
 		return 	2 * i + 1;
 	}	
-	inline int RBROTHER(const int& i) {
+	inline size_t RBROTHER(const size_t& i) {
 		return 	i+1;
 	}
-	inline int LBROTHER(const int& i) {
+	inline size_t LBROTHER(const size_t& i) {
 		return 	i-1;
 	}
-	inline int RCHILD(const int& i) {
+	inline size_t RCHILD(const size_t& i) {
 		return 	2 * i + 2;
 	}
-	inline bool haveGrandparent(const int& i) {
+	inline bool haveGrandparent(const size_t& i) {
 		return i > 2;
 	}
-	inline bool isRChild(const int& i) {
+	inline bool isRChild(const size_t& i) {
 		return !(i % 2);
 	}
 

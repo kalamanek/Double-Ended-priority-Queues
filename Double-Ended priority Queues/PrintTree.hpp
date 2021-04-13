@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <math.h> 
 #include <vector>
+#include <iostream>	
 
 
 #define P(i) ((i-1) / 2)
@@ -16,10 +17,10 @@ void print(const std::vector<Element<T>>& v) {
 
     print_pos[0] = 0;
     for (i = 0, j = 1; i < NUM_NODES; i++, j++) {
-        pos = print_pos[P(i)] + (i % 2 ? -1 : 1) * (LINE_WIDTH / (pow(2, level + 1)) + 1);
+        pos = (int) (print_pos[P(i)] + (i % 2 ? -1 : 1) * (LINE_WIDTH / (pow(2, level + 1)) + 1));
 
-        for (k = 0; k < pos - x; k++) printf("%c", i == 0 || i % 2 ? ' ' : '-');
-        printf("%d", v[i].key);
+        for (k = 0; k < pos - x; k++) std::cout <<  (i == 0 || i % 2 ? ' ' : '-');
+        std::cout << v[i].key;
 
         print_pos[i] = x = pos + 1;
         if (j == pow(2, level)) {
