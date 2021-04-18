@@ -139,40 +139,40 @@ class SymmetricMinMaxHeap : public QueueBase<T> {
 	}
 	
 	inline [[nodiscard]] size_t pushMinDown() { // contexpr z max dla przejrzystosci?
-		size_t ElementCurrentIndex = 1;
+		size_t elementCurrentIndex = 1;
 		while (true) {
-			if (auto left = LCHILD(ElementCurrentIndex); left < v.size()) {
+			if (auto left = LCHILD(elementCurrentIndex); left < v.size()) {
 				const auto& leftKey = v[left].key;
-				if (auto right = LCHILD(RBROTHER(ElementCurrentIndex)); right < v.size())
+				if (auto right = LCHILD(RBROTHER(elementCurrentIndex)); right < v.size())
 					if (const auto& rightKey = v[right].key; rightKey <= leftKey) {
-						v[ElementCurrentIndex] = v[right];
-						ElementCurrentIndex = right;
+						v[elementCurrentIndex] = v[right];
+						elementCurrentIndex = right;
 						continue;
 					}
-				v[ElementCurrentIndex] = v[left];
-				ElementCurrentIndex = left;
+				v[elementCurrentIndex] = v[left];
+				elementCurrentIndex = left;
 			}else break;
 		}
-		return ElementCurrentIndex;
+		return elementCurrentIndex;
 	}
 
 	inline [[nodiscard]] size_t pushMaxDown() {
-		size_t ElementCurrentIndex = 2;
+		size_t elementCurrentIndex = 2;
 		while (true) {
-			if (auto left = RCHILD(LBROTHER(ElementCurrentIndex)); left < v.size()) {
+			if (auto left = RCHILD(LBROTHER(elementCurrentIndex)); left < v.size()) {
 				const auto& leftKey = v[left].key;
-				if (auto right = RCHILD(ElementCurrentIndex); right < v.size())
+				if (auto right = RCHILD(elementCurrentIndex); right < v.size())
 					if (const auto& rightKey = v[right].key;  leftKey <= rightKey) {
-						v[ElementCurrentIndex] = v[right];
-						ElementCurrentIndex = right;
+						v[elementCurrentIndex] = v[right];
+						elementCurrentIndex = right;
 						continue;
 					}
-				v[ElementCurrentIndex] = v[left];
-				ElementCurrentIndex = left;
+				v[elementCurrentIndex] = v[left];
+				elementCurrentIndex = left;
 			}
 			else break;
 		}
-		return ElementCurrentIndex;
+		return elementCurrentIndex;
 	}
 
 	public:
