@@ -35,5 +35,8 @@
     <ClInclude Include="Queues\IntervalHeap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Queues\MinMaxHeap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

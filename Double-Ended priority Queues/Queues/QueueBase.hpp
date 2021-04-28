@@ -13,6 +13,7 @@ class QueueBase {
 	virtual void removeMin() = 0;
 	virtual void removeMax() = 0;
 	virtual void put(Element<T>&) = 0;
+	virtual void dumpKeys() = 0;
 };
 
 #endif
