@@ -5,8 +5,8 @@
 #include "Queues/MinMaxHeap.hpp"
 
 template<typename T>
-void insertSample(QueueBase<T>& q) {
-    for (int i = 0; i <= 49; i++) {
+void insertSample(QueueBase<T>& q , int limit = 15) {
+    for (int i = 0; i < limit; i++) {
         auto e = Element<int>{ size_t(i), 2 };
         q.put(e);
        // q.dumpKeys();
@@ -20,9 +20,22 @@ void insertSample(QueueBase<T>& q) {
 }
 
 template<typename T>
-void removeMaxOrder(QueueBase<T>& q) {  //TEMPORARY TODO
+void removeMinOrder(QueueBase<T>& q, int limit = 15) {  //TEMPORARY TODO
     try {
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < limit; i++) {
+            std::cout << '\n' << q.getMin().key << '\n';
+            q.removeMin();
+            q.dumpKeys();
+        }
+    }
+    catch (std::exception e) {
+        return;
+    }
+}
+template<typename T>
+void removeMaxOrder(QueueBase<T>& q, int limit = 15) {  //TEMPORARY TODO
+    try {
+        for (int i = 0; i < limit; i++) {
             std::cout << '\n' << q.getMax().key << '\n';
             q.removeMax();
             q.dumpKeys();
@@ -34,11 +47,11 @@ void removeMaxOrder(QueueBase<T>& q) {  //TEMPORARY TODO
 }
 
 
-
 int main() {
 
     auto a = MinMaxHeap<int>();
-    insertSample(a);
-    removeMaxOrder(a);
+    insertSample(a,50);
+    a.dumpKeys();
+    removeMaxOrder(a,50);
 
 }
