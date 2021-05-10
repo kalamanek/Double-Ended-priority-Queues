@@ -130,7 +130,6 @@ public:
 			throw std::exception("heap is empty");
 		else 
 			return v.front();
-		
 	}
 	Element<T> getMax() {
 		if (v.size() < 2) { 

@@ -3,13 +3,14 @@
 #include "Queues/SymmetricMinMaxHeap.hpp"    
 #include "Queues/IntervalHeap.hpp"
 #include "Queues/MinMaxHeap.hpp"
+#include "Queues/Deap.hpp"
 
 template<typename T>
 void insertSample(QueueBase<T>& q , int limit = 15) {
-    for (int i = 0; i < limit; i++) {
+    for (int i = limit; i > 0; i--) {
         auto e = Element<int>{ size_t(i), 2 };
         q.put(e);
-       // q.dumpKeys();
+        q.dumpKeys();
     }
     //for (auto key : { 4, 80, 8, 60, 6, 40, 12, 20, 10, 16, 14, 30 }) {
 /*  for (auto key : { 30,14,16,10,20,12,40,6,60,8,80,4}) {
@@ -25,7 +26,7 @@ void removeMinOrder(QueueBase<T>& q, int limit = 15) {  //TEMPORARY TODO
         for (int i = 0; i < limit; i++) {
             std::cout << '\n' << q.getMin().key << '\n';
             q.removeMin();
-            q.dumpKeys();
+          //  q.dumpKeys();
         }
     }
     catch (std::exception e) {
@@ -38,7 +39,7 @@ void removeMaxOrder(QueueBase<T>& q, int limit = 15) {  //TEMPORARY TODO
         for (int i = 0; i < limit; i++) {
             std::cout << '\n' << q.getMax().key << '\n';
             q.removeMax();
-            q.dumpKeys();
+          //  q.dumpKeys();
         }
     }
     catch (std::exception e) {
@@ -46,12 +47,10 @@ void removeMaxOrder(QueueBase<T>& q, int limit = 15) {  //TEMPORARY TODO
     }
 }
 
-
 int main() {
 
-    auto a = MinMaxHeap<int>();
+    auto a = Deap<int>();
     insertSample(a,50);
-    a.dumpKeys();
+    // a.dumpKeys();
     removeMaxOrder(a,50);
-
 }
