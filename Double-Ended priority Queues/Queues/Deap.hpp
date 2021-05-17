@@ -225,12 +225,11 @@ public:
 		auto leafIndex = pushMaxDown(2);
 		v[leafIndex] = tmp;
 		auto [_, correspodingIndex] = isMinLevelAndCorresponding(leafIndex);
-		//max z dzieci o ile istnieja
-		if (auto lChild = LCHILD(correspodingIndex); lChild < v.size()) {
-			auto maxC = maxChild(correspodingIndex);
-			if (v[correspodingIndex].key < v[maxC].key)
+	
+		if (auto lChild = LCHILD(correspodingIndex); lChild < v.size()) 		  //max z dzieci o ile istnieja
+			if (auto maxC = maxChild(correspodingIndex); v[correspodingIndex].key < v[maxC].key)
 				correspodingIndex = maxC;
-		}
+		
 
 		if(v[leafIndex].key < v[correspodingIndex].key) {
 			swap(correspodingIndex, leafIndex);
