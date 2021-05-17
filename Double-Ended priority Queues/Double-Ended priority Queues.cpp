@@ -49,7 +49,7 @@ void removeMaxOrder(QueueBase<T>& q, int limit = 15) {  //TEMPORARY TODO
 
 int main() {
 
-    auto a = MinMaxHeap<int>();
+    auto a = Deap<int>();
 
     insertSample(a, 50);
     // a.dumpKeys();
