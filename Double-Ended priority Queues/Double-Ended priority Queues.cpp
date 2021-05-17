@@ -26,7 +26,7 @@ void removeMinOrder(QueueBase<T>& q, int limit = 15) {  //TEMPORARY TODO
         for (int i = 0; i < limit; i++) {
             std::cout << '\n' << q.getMin().key << '\n';
             q.removeMin();
-          //  q.dumpKeys();
+            q.dumpKeys();
         }
     }
     catch (std::exception e) {
@@ -39,7 +39,7 @@ void removeMaxOrder(QueueBase<T>& q, int limit = 15) {  //TEMPORARY TODO
         for (int i = 0; i < limit; i++) {
             std::cout << '\n' << q.getMax().key << '\n';
             q.removeMax();
-          //  q.dumpKeys();
+            q.dumpKeys();
         }
     }
     catch (std::exception e) {
@@ -49,8 +49,9 @@ void removeMaxOrder(QueueBase<T>& q, int limit = 15) {  //TEMPORARY TODO
 
 int main() {
 
-    auto a = Deap<int>();
-    insertSample(a,50);
+    auto a = MinMaxHeap<int>();
+
+    insertSample(a, 50);
     // a.dumpKeys();
     removeMaxOrder(a,50);
 }

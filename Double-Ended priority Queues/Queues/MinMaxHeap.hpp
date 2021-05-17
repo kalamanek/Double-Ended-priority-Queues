@@ -108,19 +108,41 @@ class MinMaxHeap : public QueueBase<T> {
 	inline size_t maxGrandchild(const size_t& i) {// Granchild MUSI istniec
 		auto maxLchild = maxChild(LCHILD(i));
 		if (auto rChild = RCHILD(i); LCHILD(rChild) < v.size()) {// jezeli jest conajmniej 3 wnukow
-			auto maxRchild = minChild(rChild);
+			auto maxRchild = maxChild(rChild);
 			return v[maxLchild].key < v[maxRchild].key ?  maxRchild : maxLchild;
 		}
 		else
 			return maxLchild;
 	}
+	inline unsigned int elementLevel(const size_t& number) {// TODO asember ???
+/*		auto level;
+		asm("bsrl %1, %0"
+			: "=r" (level)
+			: "r" (i));
+		return level;
+		*/
+		int i;
+		unsigned int position = 0;
+		for (i = (number >> 1); i != 0; ++position)
+			i >>= 1;
 
+		return position;
+	}
+	/*
 	inline bool oddLevel(const size_t& i) { // TODO jakas idea??  NIE DZIALA PIERWSZYCH 2 POZIOMOW
 		if (auto parent = PARENT(i); v[parent].key < v[PARENT(parent)].key)
 			return false;
 		else
 			return true;
 	}
+	*/	 
+	inline bool oddLevel(const size_t& i) { // TODO jakas idea??  NIE DZIALA PIERWSZYCH 2 POZIOMOW
+		if (auto level = elementLevel(i + 1); level % 2 == 1)
+			return false;
+		else
+			return true;
+	}
+
 	inline bool isRChild(const size_t& i) {
 		return !(i % 2);
 	}

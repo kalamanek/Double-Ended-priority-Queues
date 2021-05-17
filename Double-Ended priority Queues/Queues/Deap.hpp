@@ -225,6 +225,7 @@ public:
 		auto leafIndex = pushMaxDown(2);
 		v[leafIndex] = tmp;
 		auto [_, correspodingIndex] = isMinLevelAndCorresponding(leafIndex);
+		//max z dzieci o ile istnieja
 		if (v[correspodingIndex].key < v[leafIndex].key) {
 			swap(correspodingIndex, leafIndex);
 			pushUp(correspodingIndex);
