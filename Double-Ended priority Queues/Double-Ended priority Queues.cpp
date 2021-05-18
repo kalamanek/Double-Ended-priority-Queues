@@ -5,6 +5,7 @@
 #include "Queues/IntervalHeap.hpp"
 #include "Queues/MinMaxHeap.hpp"
 #include "Queues/Deap.hpp"
+#include <cassert>
 
 template<typename T>
 void insertSample(QueueBase<T>& q , int limit = 15) {
@@ -23,8 +24,9 @@ void insertSample(QueueBase<T>& q , int limit = 15) {
 template<typename T>
 void removeMinOrder(QueueBase<T>& q, unsigned int limit = 15) {  //TEMPORARY TODO
     try {
-        for (int i = 0; i < limit; i++) {
-            //std::cout << '\n' << q.getMin().key << '\n';
+        for (int i = 1; i <= limit; i++) {
+            //std::cout << '\n' << q.getMin().key << '\n';  
+            assert(i == q.getMin().key);
             q.removeMin();
         }
     }
@@ -35,8 +37,9 @@ void removeMinOrder(QueueBase<T>& q, unsigned int limit = 15) {  //TEMPORARY TOD
 template<typename T>
 void removeMaxOrder(QueueBase<T>& q, unsigned int limit = 15) {  //TEMPORARY TODO
     try {
-        for (int i = 0; i < limit; i++) {
+        for (int i = limit ; i > 0; i--) {
             //std::cout << '\n' << q.getMax().key << '\n';
+            assert(i == q.getMax().key);
             q.removeMax();
         }
     }
@@ -68,11 +71,17 @@ void test(QueueBase<T>& q, unsigned int limit) {
 
 int main() {
     auto a = SymmetricMinMaxHeap<int>();
-//    auto a = Deap<int>();
-//    auto a = IntervalHeap<int>();
-//    auto a = MinMaxHeap<int>();
-
-    test<int>(a, 5000);
+    auto b = Deap<int>();
+    auto c = IntervalHeap<int>();
+    auto d = MinMaxHeap<int>();
+    std::cout << "symetric\n";
+    test<int>(a, 50000);
+    std::cout << "deap\n";
+    test<int>(b, 50000);
+    std::cout << "interval\n";
+    test<int>(c, 50000);
+    std::cout << "minmax\n";
+    test<int>(d, 50000);
 
     return 0;
 }
