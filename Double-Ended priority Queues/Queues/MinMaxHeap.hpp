@@ -85,7 +85,7 @@ class MinMaxHeap : public QueueBase<T> {
 	inline size_t minChild(const size_t& i) { //child musi istniec
 		auto lchild = LCHILD(i);
 		if (lchild + 1 < v.size())// wszystkie dzieci			
-			return v[lchild ].key < v[lchild + 1].key ? lchild : lchild + 1;
+			return v[lchild].key < v[lchild + 1].key ? lchild : lchild + 1;
 		else
 			return lchild;	 // tylko jeden element
 	}
@@ -109,24 +109,42 @@ class MinMaxHeap : public QueueBase<T> {
 		auto maxLchild = maxChild(LCHILD(i));
 		if (auto rChild = RCHILD(i); LCHILD(rChild) < v.size()) {// jezeli jest conajmniej 3 wnukow
 			auto maxRchild = maxChild(rChild);
-			return v[maxLchild].key < v[maxRchild].key ?  maxRchild : maxLchild;
+			return v[maxLchild].key < v[maxRchild].key ? maxRchild : maxLchild;
 		}
 		else
 			return maxLchild;
 	}
-	inline unsigned int elementLevel(const size_t& number) {// TODO asember ???
+	inline unsigned int /*__declspec(naked)*/ elementLevel(size_t number) {// TODO asember ???
+		unsigned int res = 0;
+		while (haveParent(number)) {
+			++res;
+			number = PARENT(number);
+		}
+		return res;
+
 /*		auto level;
 		asm("bsrl %1, %0"
 			: "=r" (level)
 			: "r" (i));
 		return level;
 		*/
-		int i;
-		unsigned int position = 0;
-		for (i = (number >> 1); i != 0; ++position)
-			i >>= 1;
 
-		return position;
+		//unsigned long result;
+		//_BitScanForward(&result, number);
+		//return result;
+
+		//__asm {
+		//	mov rax, number
+		//	bsr rax, rax
+		//	ret
+		//}
+
+		//int i;
+		//unsigned int position = 0;
+		//for (i = (number >> 1); i != 0; ++position)
+		//	i >>= 1;
+
+		//return position;
 	}
 	/*
 	inline bool oddLevel(const size_t& i) { // TODO jakas idea??  NIE DZIALA PIERWSZYCH 2 POZIOMOW
@@ -137,10 +155,8 @@ class MinMaxHeap : public QueueBase<T> {
 	}
 	*/	 
 	inline bool oddLevel(const size_t& i) { // TODO jakas idea??  NIE DZIALA PIERWSZYCH 2 POZIOMOW
-		if (auto level = elementLevel(i + 1); level % 2 == 1)
-			return false;
-		else
-			return true;
+		// return elementLevel(i + 1) % 2 == 0;
+		return elementLevel(i) % 2 == 0;
 	}
 
 	inline bool isRChild(const size_t& i) {
@@ -151,10 +167,14 @@ class MinMaxHeap : public QueueBase<T> {
 		//std::cout << "zamieniam " << v[a].key << " z " << v[b].key << '\n';
 		std::swap(v[a], v[b]);
 	}
-	inline void pushDownMin(size_t current) {// TODO from index to pointers??
+	inline void pushDownMin(size_t current) {
 		while (true) {
 			if (haveGrandchild(current)) {// ma wnukow wiec zamieniami z nimi jak trzeba po czym zamieniamy z dzieckiem
 				auto minGc = minGrandchild(current);
+				if (auto rchild = RCHILD(current); !haveChild(rchild) && v[rchild].key < v[current].key && v[rchild].key < v[minGc].key) {
+					swap(rchild, current);
+					return;
+				}
 				if (v[minGc].key < v[current].key) {
 					swap(minGc, current);
 					current = minGc;
@@ -176,6 +196,10 @@ class MinMaxHeap : public QueueBase<T> {
 		while (true) {
 			if (haveGrandchild(current)) {// ma wnukow wiec zamieniami z nimi jak trzeba po czym zamieniamy z dzieckiem
 				auto maxGc = maxGrandchild(current);
+				if (auto rchild = RCHILD(current); !haveChild(rchild) && v[current].key < v[rchild].key && v[maxGc].key < v[rchild].key) {
+					swap(rchild, current);
+					return;
+				}
 				if (v[current].key < v[maxGc].key) {
 					swap(maxGc, current);
 					current = maxGc;
@@ -259,14 +283,14 @@ public:
 			}
 		}
 	}
-	void put(Element<T>& e) {
+	void put(const Element<T>& e) {
 		auto current = v.size();
 		v.emplace_back(e);
 
 		if (!haveParent(current))
 			return;
 		else if (!haveGrandparent(current)) {
-			if (v.front().key > v[current].key)
+			if (v[current].key < v[0].key)
 				swap(0, current);
 		}
 		else { // przypadki 2 pierwszych poziomow rozpatrzone
@@ -299,7 +323,28 @@ public:
 				}
 				else return; // wszystko ok
 			} 
-	
+
+			auto s = v.size();
+
+			while (true) {
+				if (auto parent = PARENT(current); haveParent(current)) {
+					if (levelType == (v[parent].key < currentKey)) {
+						swap(current, parent);
+						current = parent;
+						levelType = !levelType;
+						continue;
+					}
+					else if (auto grandpa = PARENT(parent); haveParent(parent)) {
+						if (levelType == (currentKey < v[grandpa].key)) {
+							swap(current, grandpa);
+							current = grandpa;
+							continue;
+						}
+					}
+				}
+				return;
+			}
+			/*
 			if (levelType) {	// level min
 				while (haveGrandparent(current)) {
 					grandparent = PARENT(PARENT(current));
@@ -320,7 +365,8 @@ public:
 					else return;
 				}
 			}
-		}			  
+			*/
+		}
 	}
 	void dumpKeys() {
 		std::cout << '\n';

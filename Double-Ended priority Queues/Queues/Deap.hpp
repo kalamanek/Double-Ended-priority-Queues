@@ -11,6 +11,8 @@
 template<typename T>
 class Deap : public QueueBase<T> {
 	std::vector<Element<T>> v;
+	size_t height;
+	size_t size;
 
 	inline size_t PARENT(const size_t& i) {
 		return 	((i - 1) / 2);
@@ -26,42 +28,32 @@ class Deap : public QueueBase<T> {
 	}
 	inline size_t minChild(const size_t& i) { //lchild musi istniec
 		auto lchild = LCHILD(i);
-		if (lchild + 1 < v.size())// wszystkie dzieci			
+		if (lchild + 1 < size)// wszystkie dzieci			
 			return v[lchild].key < v[lchild + 1].key ? lchild : lchild + 1;
 		else
 			return lchild;	 // tylko jeden element
 	}
 	inline size_t maxChild(const size_t& i) { //lchild musi istniec
 		auto lchild = LCHILD(i);
-		if (lchild + 1 < v.size())// wszystkie dzieci			
+		if (lchild + 1 < size)// wszystkie dzieci			
 			return v[lchild + 1].key < v[lchild].key ? lchild : lchild + 1;
 		else
 			return lchild;	 // tylko jeden element
 	}
-	inline unsigned int elementLevel(const size_t& number) {// TODO asember ???
-/*		auto level;
-		asm("bsrl %1, %0"
-			: "=r" (level)
-			: "r" (i));
-		return level;
-		*/
-		int i;
-		unsigned int position = 0;
-		for (i = (number >> 1); i != 0; ++position)
-			i >>= 1;
-
-		return position;
-	}
 
 	inline std::pair<bool, size_t> isMinLevelAndCorresponding(const size_t& i) {		// diala tylko do inisertu (ostatni element w drzewie zupelnym)
-		const auto level = elementLevel(i + 1);
-		const int halfLevelIndexAmount = std::pow(2, level-1);
-		const int LevelIndexAmount = halfLevelIndexAmount * 2;
-		const auto isMinLevel = (i < LevelIndexAmount + ((LevelIndexAmount - 1) / 2) ? true : false);
+		//const auto level = elementLevel(i + 1);
+		auto lastLevelBegin = (1 << height) - 1;
+		const size_t level = lastLevelBegin <= i ? height : height - 1;
+		//const size_t level = elementLevel(i);
+		const size_t LevelIndexAmount = 1 << level;
+		const size_t halfLevelIndexAmount = LevelIndexAmount / 2;
+
+		const auto isMinLevel = (i < LevelIndexAmount - 1 + halfLevelIndexAmount ? true : false);
 		
 		if (isMinLevel) {//minlvl
 			auto optional = i + halfLevelIndexAmount;
-			if (optional < v.size()) {// jezeli istnieje odpowiadajacy pozycji w max drzewku
+			if (optional < size) {// jezeli istnieje odpowiadajacy pozycji w max drzewku
 				return std::make_pair(true, optional);
 			}
 			else {
@@ -83,7 +75,7 @@ class Deap : public QueueBase<T> {
 	/*
 	inline size_t pushMaxDown(size_t curr) {
 		auto leftChild = LCHILD(curr);
-		while (leftChild < v.size()) {
+		while (leftChild < size) {
 			auto min = maxChild(curr);
 			if (v[curr].key < v[min].key) {
 				swap(min, curr);
@@ -95,7 +87,7 @@ class Deap : public QueueBase<T> {
 	}
 	inline size_t pushMinDown(size_t curr) {
 		auto leftChild = LCHILD(curr);
-		while (leftChild < v.size()) {
+		while (leftChild < size) {
 			auto max = minChild(curr);
 			if (v[max].key < v[curr].key) {
 				swap(max, curr);
@@ -107,7 +99,7 @@ class Deap : public QueueBase<T> {
 	} */
 	inline size_t pushMaxDown(size_t curr) {
 		auto leftChild = LCHILD(curr);
-		while (leftChild < v.size()) {
+		while (leftChild < size) {
 			auto max = maxChild(curr);
 			v[curr]= v[max];
 			curr = max;
@@ -117,7 +109,7 @@ class Deap : public QueueBase<T> {
 	}
 	inline size_t pushMinDown(size_t curr) {
 		auto leftChild = LCHILD(curr);
-		while (leftChild < v.size()) {
+		while (leftChild < size) {
 			auto min = minChild(curr);
 			v[curr] = v[min];
 			curr = min;
@@ -169,38 +161,48 @@ class Deap : public QueueBase<T> {
 public:
 	Deap() {
 		v.emplace_back();
+		height = 0;
+		size = 1;
 	}
 	~Deap() {}
 	Element<T> getMin() {
-		if (v.size() == 1)
+		if (size == 1)
 			throw std::exception("heap is mpty");
 		else
 			return v[1];
 	}
 	Element<T> getMax() {
-		if (v.size() == 1)
+		if (size == 1)
 			throw std::exception("heap is empty");
-		else if (v.size() == 2)
+		else if (size == 2)
 			return v[1];
 		else
 			return v[2];
 	}
-	void removeMin() {
-		if (v.size() <= 3) {
-			if (v.size() == 1) {
+
+	inline bool isPow2(size_t x) { return 0 == (x & (x - 1)); }
+	inline void removeMin() {
+		if (size <= 3) {
+			if (size == 1) {
 				throw std::exception("heap is empty");
 			}
-			else if (v.size() == 3) {// 2 elementy
+			else if (size == 3) {// 2 elementy
 				v[1] = v.back();
 				v.pop_back();
+				size = 2;
 			}
 			else {// 1 element
 				v.pop_back();
+				height = 0;
+				size = 1;
 			}
 			return;
 		}
 		auto tmp = v.back();
+		if (isPow2(size)) --height;
+		--size;
 		v.pop_back();
+
 		auto leafIndex = pushMinDown(1);
 		v[leafIndex] = tmp;
 		auto [_, correspodingIndex] = isMinLevelAndCorresponding(leafIndex);
@@ -210,23 +212,27 @@ public:
 		}
 		pushUp(leafIndex);
 	}
-	void removeMax() {
-		if (v.size() <= 3) {
-			if (v.size() == 1) {
+	inline void removeMax() {
+		if (size <= 3) {
+			if (size == 1) {
 				throw std::exception("heap is empty");
 			}
-			else {// 1 element
+			else {// 1 lub 2 elementy
 				v.pop_back();
+				--size;
+				height = size == 1 ? 0 : 1;
 			}
 			return;
 		}
 		auto tmp = v.back();
+		if (isPow2(size)) --height;
+		--size;
 		v.pop_back();
 		auto leafIndex = pushMaxDown(2);
 		v[leafIndex] = tmp;
 		auto [_, correspodingIndex] = isMinLevelAndCorresponding(leafIndex);
 	
-		if (auto lChild = LCHILD(correspodingIndex); lChild < v.size()) 		  //max z dzieci o ile istnieja
+		if (auto lChild = LCHILD(correspodingIndex); lChild < size) 		  //max z dzieci o ile istnieja
 			if (auto maxC = maxChild(correspodingIndex); v[correspodingIndex].key < v[maxC].key)
 				correspodingIndex = maxC;
 		
@@ -237,9 +243,11 @@ public:
 		}
 		pushUp(leafIndex);
 	}
-	void put(Element<T>& e) {
-		auto current = v.size();
+	void put(const Element<T>& e) {
+		auto current = size;
 		v.emplace_back(e);
+		++size;
+		if (isPow2(size)) ++height;
 		if (current == 1)	return; // dodalismy pirwszy element, struktura nie wymaga naprawy
 		
 		// mamy na ostatnim elemencie nowy element

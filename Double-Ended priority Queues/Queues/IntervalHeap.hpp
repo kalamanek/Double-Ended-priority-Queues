@@ -165,7 +165,7 @@ public:
 		pushMaxDown(); //naprawa struktury
 
 	}
-	void put(Element<T>& e) {
+	void put(const Element<T>& e) {
 		auto last = v.size();
 		v.emplace_back(e);
 		pushUp(last);

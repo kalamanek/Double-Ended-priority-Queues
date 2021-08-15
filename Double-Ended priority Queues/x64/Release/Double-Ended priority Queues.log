@@ -1,0 +1,12 @@
+﻿  Double-Ended priority Queues.cpp
+A:\Double-Ended-priority-Queues\Double-Ended priority Queues\Double-Ended priority Queues.cpp(18,21): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+A:\Double-Ended-priority-Queues\Double-Ended priority Queues\Queues\Deap.hpp(49,1): warning C4334: '<<': result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
+A:\Double-Ended-priority-Queues\Double-Ended priority Queues\Queues\Deap.hpp(44): message : while compiling class template member function 'std::pair<bool,size_t> Deap<int>::isMinLevelAndCorresponding(const size_t &)'
+A:\Double-Ended-priority-Queues\Double-Ended priority Queues\Queues\Deap.hpp(233): message : see reference to function template instantiation 'std::pair<bool,size_t> Deap<int>::isMinLevelAndCorresponding(const size_t &)' being compiled
+A:\Double-Ended-priority-Queues\Double-Ended priority Queues\Double-Ended priority Queues.cpp(137): message : see reference to class template instantiation 'Deap<int>' being compiled
+  Generating code
+  111 of 481 functions (23.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    42 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  Double-Ended priority Queues.vcxproj -> A:\Double-Ended-priority-Queues\x64\Release\Double-Ended priority Queues.exe

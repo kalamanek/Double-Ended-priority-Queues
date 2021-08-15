@@ -5,6 +5,7 @@
 #include <vector>
 #include <stdexcept>
 #include <iostream>	
+#include <cassert>
 #include "QueueBase.hpp"
 
 
@@ -109,6 +110,30 @@ class SymmetricMinMaxHeap : public QueueBase<T> {
 	}
 
 	inline void pushUp(size_t newElementCurrentIndex) {
+		if (0 && haveGrandparent(newElementCurrentIndex)) {
+			auto grandparentIndex = PARENT(PARENT(newElementCurrentIndex));
+			auto [elementKey, _] = v[newElementCurrentIndex];
+			if (auto temp = LCHILD(grandparentIndex); elementKey < v[temp].key) {
+				do{ 
+					swap(temp, newElementCurrentIndex);
+					newElementCurrentIndex = temp;
+					elementKey = v[newElementCurrentIndex].key;
+					grandparentIndex = PARENT(PARENT(newElementCurrentIndex));
+					temp = LCHILD(grandparentIndex);
+				} while (haveGrandparent(newElementCurrentIndex) && elementKey < v[temp].key);
+
+			}
+			else if (auto temp = RCHILD(grandparentIndex); v[temp].key < elementKey) { // temp++ dla optymalnosci? -przejrzystosc
+				do {
+					swap(temp, newElementCurrentIndex);
+					newElementCurrentIndex = temp;
+					elementKey = v[newElementCurrentIndex].key;
+					grandparentIndex = PARENT(PARENT(newElementCurrentIndex));
+					temp = RCHILD(grandparentIndex);
+				} while (haveGrandparent(newElementCurrentIndex) && v[temp].key < elementKey);
+			}
+			else return;
+		}
 		while (haveGrandparent(newElementCurrentIndex)) {
 			auto grandparentIndex = PARENT(PARENT(newElementCurrentIndex));
 			auto [elementKey, _] = v[newElementCurrentIndex];
@@ -125,7 +150,7 @@ class SymmetricMinMaxHeap : public QueueBase<T> {
 			else return;
 		};
 	}
-	inline void fixWithBrother(size_t& elementIndex) {
+	inline void fixWithBrother(size_t elementIndex) {
 		if (isRChild(elementIndex)) {
 			if (auto l = LBROTHER(elementIndex);  v[elementIndex].key < v[l].key) {
 				swap(elementIndex, l);
@@ -195,7 +220,74 @@ class SymmetricMinMaxHeap : public QueueBase<T> {
 		else 
 			return v[2]; 
 	}
+
+	void removeMinAndAdd(size_t size, size_t root, Element<T>& res, Element<T>& x) {
+		const auto lchild = LCHILD(root), rchild = RCHILD(root);
+
+		if (size <= lchild || x.key < v[lchild].key) {
+			res = x;
+			return;
+		}
+
+		res = v[lchild];
+
+		if (rchild < size && v[rchild].key < x.key)
+			std::swap(v[rchild], x);
+
+		if (LCHILD(rchild) < size && v[LCHILD(rchild)].key < v[LCHILD(lchild)].key)
+			removeMinAndAdd(size, rchild, v[lchild], x);
+		else if (LCHILD(lchild) < size)
+			removeMinAndAdd(size, lchild, v[lchild], x);
+		else
+			v[lchild] = x;
+		
+	}
+
+	void removeMaxAndAdd(size_t size, size_t root, Element<T>& res, Element<T>& x) {
+		const auto lchild = LCHILD(root), rchild = RCHILD(root);
+
+
+		if (rchild < size) { // 2 dzieci
+			if (v[rchild].key < x.key)
+				res = x;
+			else {
+				res = v[rchild];
+
+				if (x.key < v[lchild].key)
+					std::swap(x, v[lchild]);
+
+				if (RCHILD(rchild) < size && v[RCHILD(lchild)].key < v[RCHILD(rchild)].key)
+					removeMaxAndAdd(size, rchild, v[rchild], x);
+				else if (RCHILD(lchild) < size)
+					removeMaxAndAdd(size, lchild, v[rchild], x);
+				else
+					v[rchild] = x;
+			}
+		}
+		else if (rchild == size) { // 1 dziecko
+			if (v[lchild].key < x.key)
+				res = x;
+			else {
+				res = v[lchild];
+				v[lchild] = x;
+			}
+		}
+		else { // 0 dzieci
+			res = v[rchild];
+			v[rchild] = x;
+		}
+	}
+
 	void removeMin() {
+		//assert(!v.empty());
+		auto x = v.back(); v.pop_back();
+		if (v.size() != 1) {
+			Element<T> res;
+			removeMinAndAdd(v.size(), 0, res, x);
+		}
+	}
+
+	void _removeMin() {
 		auto size = v.size();
 		if (size <= 3) { // przypadki indywidualne
 			if (size == 3) {
@@ -225,7 +317,17 @@ class SymmetricMinMaxHeap : public QueueBase<T> {
 		}
 		v.pop_back();
 	}
+
 	void removeMax() {
+		//assert(!v.empty());
+		auto x = v.back(); v.pop_back();
+		if (2 < v.size()) {
+			Element<T> res;
+			removeMaxAndAdd(v.size(), 0, res, x);
+		}
+	}
+
+	void _removeMax() {
 		auto size = v.size();
 		if (size <= 3) { // przypadki indywidualne
 			if (size == 3) {
@@ -254,7 +356,7 @@ class SymmetricMinMaxHeap : public QueueBase<T> {
 
 
 	}
-	void put(Element<T>& e) {
+	void put(const Element<T>& e) {
 		
 		if (auto size = v.size(); size <= 2) { //  indywidualne przypadki gdy elementy nie maja dziadkow
 			if (size == 2 && v[1].key > e.key)
